@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pebble</title>
+    <style>
+        /* ================= 全局变量与暖色调 ================= */
+        :root {
+            --bg-color: #f0ede6;
+            --text-color: #5c544a;
+            --text-light: #8c8273;
+            --shadow-light: #ffffff;
+            --shadow-dark: #d1cec8;
+            --accent-color: #e3a890;    /* 暖珊瑚色 (主色) */
+            --success-color: #9cb898;   /* 柔和绿色 (成功) */
+            --danger-color: #e07a5f;    /* 砖红色 (危险/删除) */
+            --warning-color: #d4a373;   /* 暖土黄色 (警告/退回/跳过) */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex; justify-content: center; align-items: center; min-height: 100vh;
+        }
+
+        #app-container {
+            width: 100%; max-width: 480px; min-height: 100vh;
+            background-color: var(--bg-color); position: relative; overflow-x: hidden;
+        }
+        @media (min-width: 481px) {
+            #app-container { min-height: 85vh; border-radius: 40px; box-shadow: 20px 20px 60px var(--shadow-dark), -20px -20px 60px var(--shadow-light); margin: 20px; }
+        }
+
+        .page { display: none; padding: 30px 20px; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h1, h2 { text-align: center; margin-bottom: 30px; font-weight: 600; color: var(--text-color); }
+        
+        .neo-btn {
+            display: block; width: 100%; padding: 15px; margin-bottom: 20px;
+            border: none; border-radius: 15px;
+            background-color: var(--bg-color); color: var(--text-color);
+            font-size: 16px; font-weight: bold; cursor: pointer;
+            box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
+            transition: all 0.2s ease;
+        }
+        .neo-btn:active { box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); }
+        .neo-btn.primary { color: var(--accent-color); }
+        .neo-btn.success { color: var(--success-color); }
+        .neo-btn.danger { color: var(--danger-color); }
+        .neo-btn.warning { color: var(--warning-color); }
+        
+        /* 动作按钮组 */
+        .action-group { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        .action-group .neo-btn { margin-bottom: 0; padding: 10px; font-size: 14px; flex: 1; min-width: 80px; }
+
+        .neo-input {
+            width: 100%; padding: 15px; margin-bottom: 20px; border: none; border-radius: 15px;
+            background-color: var(--bg-color); color: var(--text-color); font-size: 16px;
+            box-shadow: inset 5px 5px 10px var(--shadow-dark), inset -5px -5px 10px var(--shadow-light); outline: none;
+        }
+        .neo-input::placeholder { color: var(--text-light); }
+        textarea.neo-input { resize: vertical; min-height: 100px; }
+
+        .neo-card {
+            padding: 25px; border-radius: 20px; margin-bottom: 25px; text-align: center;
+            background-color: var(--bg-color); box-shadow: 8px 8px 16px var(--shadow-dark), -8px -8px 16px var(--shadow-light);
+        }
+        .card-word { font-size: 28px; font-weight: bold; margin-bottom: 15px; color: var(--accent-color); }
+        .card-detail { font-size: 14px; margin-bottom: 8px; color: var(--text-light); }
+        .card-meaning { font-size: 18px; margin-top: 15px; font-weight: bold; }
+
+        .nav-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .back-btn { background: none; border: none; font-size: 16px; color: var(--text-light); cursor: pointer; padding: 10px; }
+
+        #file-input { display: none; }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+
+    <div id="page-login" class="page active">
+        <br><br><br>
+        <h1>打开石室</h1>
+        <p style="text-align:center; margin-bottom: 30px; color: var(--text-light);">放置密码石(🪨)</p>
+        <input type="password" id="login-pwd" class="neo-input" placeholder="🪨🪨🪨">
+        <button class="neo-btn primary" onclick="checkLogin()">推开石门</button>
+    </div>
+
+    <div id="page-menu" class="page">
+        <h1>石室典藏</h1>
+        <button class="neo-btn" onclick="prepareWordForm('add')">⛏️ 捡拾新原石</button>
+        <button class="neo-btn" onclick="navTo('page-unlearned')">🔍 端详原石</button>
+        <button class="neo-btn primary" onclick="startLearning()">🔨 打磨试炼</button>
+        <button class="neo-btn" onclick="navTo('page-learned')">✨ 已开盒</button>
+        <div style="height: 15px;"></div>
+        <button class="neo-btn" onclick="prepareGrammarForm('add')">🗿 凿刻规则石碑</button>
+        <button class="neo-btn" onclick="navTo('page-grammar-list')">🏛️ 漫步语法碑林</button>
+        <div style="height: 15px;"></div>
+        <div style="display:flex; gap:10px;">
+            <button class="neo-btn" style="font-size: 14px;" onclick="exportDataTxt()">📦 封存石室拓片(.txt)</button>
+            <button class="neo-btn" style="font-size: 14px;" onclick="document.getElementById('file-input').click()">📜 展开旧日拓片</button>
+            <input type="file" id="file-input" accept=".txt" onchange="importDataTxt(event)">
+        </div>
+    </div>
+
+   <div id="page-edit-word" class="page">
+           <div class="nav-bar">
+               <button class="back-btn" onclick="goBackFromEditWord()">◀ 退回</button>
+               <h2 id="word-page-title">雕琢原石</h2>
+               <div style="width: 50px;"></div>
+           </div>
+           <input type="hidden" id="edit-word-id">
+           <input type="hidden" id="edit-word-type">
+           <input type="text" id="edit-base" class="neo-input" placeholder="🪨 原型 (Base)">
+           <input type="text" id="edit-past" class="neo-input" placeholder="⏳ 过去式 (Past)">
+           <input type="text" id="edit-pastPart" class="neo-input" placeholder="🕰️ 过去分词 (Past Participle)">
+           <input type="text" id="edit-presPart" class="neo-input" placeholder="🌊 现在分词 (Present Participle)">
+           <input type="text" id="edit-meaning" class="neo-input" placeholder="💡 石之真意 (中文词意)">
+           <button class="neo-btn primary" id="save-word-btn" onclick="saveWord()">存入石室</button>
+       </div>
+   
+       <div id="page-unlearned" class="page">
+           <div class="nav-bar">
+               <button class="back-btn" onclick="navTo('page-menu')">◀ 返回大厅</button>
+               <h2>粗糙原石</h2>
+               <div style="width: 50px;"></div>
+           </div>
+           <div id="unlearned-card-container"></div>
+           <button class="neo-btn" onclick="nextCard('unlearned')">换一块原石 (Next)</button>
+       </div>
+   
+       <div id="page-learn" class="page">
+           <div class="nav-bar">
+               <button class="back-btn" onclick="navTo('page-menu')">◀ 退出试炼</button>
+               <h2>打磨试炼</h2>
+               <div style="width: 50px;"></div>
+           </div>
+           <div class="neo-card" style="margin-bottom: 20px;">
+               <p class="card-detail">请凭借记忆，刻下这块石头应有的纹理：</p>
+               <div id="learn-meaning" class="card-meaning" style="font-size: 24px; color: var(--accent-color);"></div>
+           </div>
+           <input type="text" id="learn-base" class="neo-input" placeholder="🪨 原型">
+           <input type="text" id="learn-past" class="neo-input" placeholder="⏳ 过去式">
+           <input type="text" id="learn-pastPart" class="neo-input" placeholder="🕰️ 过去分词">
+           <input type="text" id="learn-presPart" class="neo-input" placeholder="🌊 现在分词">
+           
+           <div class="action-group" style="margin-top: 0;">
+               <button class="neo-btn warning" onclick="skipLearn()">太硬了，先放下 (Skip)</button>
+               <button class="neo-btn success" onclick="checkLearn()">完成打磨 (Submit)</button>
+           </div>
+       </div>
+   
+       <div id="page-learned" class="page">
+           <div class="nav-bar">
+               <button class="back-btn" onclick="navTo('page-menu')">◀ 返回大厅</button>
+               <h2>光洁宝石</h2>
+               <div style="width: 50px;"></div>
+           </div>
+           <div id="learned-card-container"></div>
+           <button class="neo-btn" onclick="nextCard('learned')">赏玩下一颗 (Next)</button>
+       </div>
+   
+       <div id="page-edit-grammar" class="page">
+           <div class="nav-bar">
+               <button class="back-btn" onclick="goBackFromEditGrammar()">◀ 退回</button>
+               <h2 id="grammar-page-title">镌刻碑文</h2>
+               <div style="width: 50px;"></div>
+           </div>
+           <input type="hidden" id="edit-gram-id">
+           <input type="text" id="edit-gram-title" class="neo-input" placeholder="🗿 碑文标题">
+           <textarea id="edit-gram-content" class="neo-input" placeholder="📜 刻下语法规则与感悟..."></textarea>
+           <button class="neo-btn primary" id="save-grammar-btn" onclick="saveGrammar()">立起石碑</button>
+       </div>
+   
+       <div id="page-grammar-list" class="page">
+           <div class="nav-bar">
+               <button class="back-btn" onclick="navTo('page-menu')">◀ 返回大厅</button>
+               <h2>语法碑林</h2>
+               <div style="width: 50px;"></div>
+           </div>
+           <div id="grammar-card-container"></div>
+           <button class="neo-btn" onclick="nextCard('grammar')">瞻仰下一座 (Next)</button>
+       </div>
+	
+</div>
+
+<script>
+    // ================= 数据初始化与持久化 =================
+    let vaultData = {
+        unlearnedWords: JSON.parse(localStorage.getItem('unlearnedWords')) || [],
+        learnedWords: JSON.parse(localStorage.getItem('learnedWords')) || [],
+        grammarPoints: JSON.parse(localStorage.getItem('grammarPoints')) || []
+    };
+
+    function generateId() {
+        // 使用随机字符确保生成的 ID 绝对唯一，防止旧版本重复冲突
+        return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function saveData() {
+        localStorage.setItem('unlearnedWords', JSON.stringify(vaultData.unlearnedWords));
+        localStorage.setItem('learnedWords', JSON.stringify(vaultData.learnedWords));
+        localStorage.setItem('grammarPoints', JSON.stringify(vaultData.grammarPoints));
+    }
+
+    // 修复点：静默升级旧数据，给所有之前存的、没有 ID 的旧单词自动补上 ID！
+    function upgradeLegacyData() {
+        let needsSave = false;
+        ['unlearnedWords', 'learnedWords', 'grammarPoints'].forEach(category => {
+            vaultData[category].forEach(item => {
+                if (!item.id) {
+                    item.id = generateId();
+                    needsSave = true;
+                }
+            });
+        });
+        if (needsSave) saveData();
+    }
+    // 网页一加载就运行体检修复
+    upgradeLegacyData();
+
+    // ================= 页面导航控制 =================
+    function navTo(pageId) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(pageId).classList.add('active');
+        
+        if(pageId === 'page-unlearned') { currentIndices.unlearned = 0; renderCard('unlearned'); }
+        if(pageId === 'page-learned') { currentIndices.learned = 0; renderCard('learned'); }
+        if(pageId === 'page-grammar-list') { currentIndices.grammar = 0; renderCard('grammar'); }
+    }
+
+    // ================= 1. 登录 =================
+    function checkLogin() {
+        const pwd = document.getElementById('login-pwd').value;
+        if (pwd === '777') {
+            document.getElementById('login-pwd').value = '';
+            navTo('page-menu');
+        } else {
+            alert('密码错误！');
+        }
+    }
+
+    // ================= 2. 核心逻辑：增、改、删、重学 =================
+    function prepareWordForm(mode, type = '', id = '') {
+        const titleEl = document.getElementById('word-page-title');
+        const btnEl = document.getElementById('save-word-btn');
+        document.querySelectorAll('#page-edit-word input.neo-input').forEach(input => input.value = '');
+        
+        if (mode === 'add') {
+            titleEl.innerText = 'Add Word';
+            btnEl.innerText = '保存到未学会';
+            document.getElementById('edit-word-id').value = '';
+            document.getElementById('edit-word-type').value = 'unlearned'; 
+        } else if (mode === 'edit') {
+            titleEl.innerText = 'Edit Word';
+            btnEl.innerText = '保存修改';
+            
+            const arr = type === 'unlearned' ? vaultData.unlearnedWords : vaultData.learnedWords;
+            const word = arr.find(w => w.id === id);
+            
+            if(!word) return alert('数据错误，找不到该单词');
+
+            document.getElementById('edit-word-id').value = word.id;
+            document.getElementById('edit-word-type').value = type;
+            document.getElementById('edit-base').value = word.base || '';
+            document.getElementById('edit-past').value = word.past || '';
+            document.getElementById('edit-pastPart').value = word.pastPart || '';
+            document.getElementById('edit-presPart').value = word.presPart || '';
+            document.getElementById('edit-meaning').value = word.meaning || '';
+        }
+        navTo('page-edit-word'); 
+    }
+
+    function saveWord() {
+        const id = document.getElementById('edit-word-id').value;
+        const type = document.getElementById('edit-word-type').value;
+        const base = document.getElementById('edit-base').value.trim();
+        const past = document.getElementById('edit-past').value.trim();
+        const pastPart = document.getElementById('edit-pastPart').value.trim();
+        const presPart = document.getElementById('edit-presPart').value.trim();
+        const meaning = document.getElementById('edit-meaning').value.trim();
+
+        if(!base || !meaning) return alert('原型和词意不能为空！');
+
+        const wordObj = { id: id || generateId(), base, past, pastPart, presPart, meaning };
+
+        if (id) {
+            const arr = type === 'unlearned' ? vaultData.unlearnedWords : vaultData.learnedWords;
+            const index = arr.findIndex(w => w.id === id);
+            if(index > -1) arr[index] = wordObj;
+            alert('修改成功！');
+            goBackFromEditWord(type);
+        } else {
+            vaultData.unlearnedWords.push(wordObj);
+            alert('添加成功！数据已实时保存在浏览器中。');
+            document.querySelectorAll('#page-edit-word input.neo-input').forEach(input => input.value = '');
+        }
+        saveData();
+    }
+
+    function goBackFromEditWord(type) {
+        const t = type || document.getElementById('edit-word-type').value;
+        if(document.getElementById('edit-word-id').value) {
+            navTo(`page-${t}`);
+            renderCard(t);
+        } else {
+            navTo('page-menu');
+        }
+    }
+
+    function prepareGrammarForm(mode, id = '') {
+        const titleEl = document.getElementById('grammar-page-title');
+        const btnEl = document.getElementById('save-grammar-btn');
+        document.getElementById('edit-gram-title').value = '';
+        document.getElementById('edit-gram-content').value = '';
+        
+        if (mode === 'add') {
+            titleEl.innerText = 'Add Grammar';
+            btnEl.innerText = '保存语法';
+            document.getElementById('edit-gram-id').value = '';
+        } else if (mode === 'edit') {
+            titleEl.innerText = 'Edit Grammar';
+            btnEl.innerText = '保存修改';
+            
+            const gram = vaultData.grammarPoints.find(g => g.id === id);
+            if(!gram) return alert('数据错误');
+            
+            document.getElementById('edit-gram-id').value = gram.id;
+            document.getElementById('edit-gram-title').value = gram.title || '';
+            document.getElementById('edit-gram-content').value = gram.content || '';
+        }
+        navTo('page-edit-grammar');
+    }
+
+    function saveGrammar() {
+        const id = document.getElementById('edit-gram-id').value;
+        const title = document.getElementById('edit-gram-title').value.trim();
+        const content = document.getElementById('edit-gram-content').value.trim();
+
+        if(!title || !content) return alert('标题和内容不能为空！');
+
+        const gramObj = { id: id || generateId(), title, content };
+
+        if (id) {
+            const index = vaultData.grammarPoints.findIndex(g => g.id === id);
+            if(index > -1) vaultData.grammarPoints[index] = gramObj;
+            alert('修改成功！');
+            goBackFromEditGrammar();
+        } else {
+            vaultData.grammarPoints.push(gramObj);
+            alert('语法添加成功！数据已实时保存在浏览器中。');
+            document.getElementById('edit-gram-title').value = '';
+            document.getElementById('edit-gram-content').value = '';
+        }
+        saveData();
+    }
+
+    function goBackFromEditGrammar() {
+        if(document.getElementById('edit-gram-id').value) {
+            navTo('page-grammar-list');
+            renderCard('grammar');
+        } else {
+            navTo('page-menu');
+        }
+    }
+
+    function deleteItem(type, id) {
+        if(!confirm('确定要删除这条记录吗？删除后无法恢复！')) return;
+
+        let arr = type === 'unlearned' ? vaultData.unlearnedWords : (type === 'learned' ? vaultData.learnedWords : vaultData.grammarPoints);
+        const index = arr.findIndex(item => item.id === id);
+        
+        if(index > -1) {
+            arr.splice(index, 1);
+            saveData();
+            
+            if(currentIndices[type] >= arr.length && arr.length > 0) {
+                currentIndices[type] = arr.length - 1;
+            } else if (arr.length === 0) {
+                currentIndices[type] = 0;
+            }
+            renderCard(type);
+        }
+    }
+
+    function moveToUnlearned(id) {
+        if(!confirm('这将被移回【未学会】列表并需要重新默写，确定吗？')) return;
+
+        const index = vaultData.learnedWords.findIndex(w => w.id === id);
+        if(index > -1) {
+            const word = vaultData.learnedWords.splice(index, 1)[0];
+            vaultData.unlearnedWords.push(word);
+            saveData();
+            
+            if(currentIndices.learned >= vaultData.learnedWords.length && vaultData.learnedWords.length > 0) {
+                currentIndices.learned = vaultData.learnedWords.length - 1;
+            } else if (vaultData.learnedWords.length === 0) {
+                currentIndices.learned = 0;
+            }
+            
+            alert('已成功移回【未学会】列表！');
+            renderCard('learned'); 
+        }
+    }
+
+    // ================= 卡片渲染逻辑 =================
+    let currentIndices = { unlearned: 0, learned: 0, grammar: 0 };
+
+    function renderCard(type) {
+        let container, arr, index;
+        if(type === 'unlearned') { container = document.getElementById('unlearned-card-container'); arr = vaultData.unlearnedWords; index = currentIndices.unlearned; }
+        else if(type === 'learned') { container = document.getElementById('learned-card-container'); arr = vaultData.learnedWords; index = currentIndices.learned; }
+        else if(type === 'grammar') { container = document.getElementById('grammar-card-container'); arr = vaultData.grammarPoints; index = currentIndices.grammar; }
+
+        if (arr.length === 0) {
+            container.innerHTML = `<div class="neo-card"><p>空空如也！</p></div>`;
+            return;
+        }
+
+        const item = arr[index];
+        
+        let revertBtnHtml = '';
+        if (type === 'learned') {
+            revertBtnHtml = `<button class="neo-btn warning" onclick="moveToUnlearned('${item.id}')">🔄 重学</button>`;
+        }
+
+        let actionButtons = `
+            <div class="action-group">
+                <button class="neo-btn" onclick="if('${type}' === 'grammar') prepareGrammarForm('edit', '${item.id}'); else prepareWordForm('edit', '${type}', '${item.id}')">编辑</button>
+                ${revertBtnHtml}
+                <button class="neo-btn danger" onclick="deleteItem('${type}', '${item.id}')">删除</button>
+            </div>
+        `;
+
+        if(type === 'grammar') {
+            container.innerHTML = `
+                <div class="neo-card">
+                    <div class="card-word" style="font-size:22px;">${item.title}</div>
+                    <div style="text-align:left; line-height:1.6; margin-bottom: 20px;">${item.content.replace(/\n/g, '<br>')}</div>
+                    <hr style="border:0; height:1px; background:var(--shadow-dark); margin: 15px 0;">
+                    <div class="card-detail">${index + 1} / ${arr.length}</div>
+                    ${actionButtons}
+                </div>`;
+        } else {
+            container.innerHTML = `
+                <div class="neo-card">
+                    <div class="card-word">${item.base}</div>
+                    <div class="card-detail">过去式: ${item.past || '-'}</div>
+                    <div class="card-detail">过去分词: ${item.pastPart || '-'}</div>
+                    <div class="card-detail">现在分词: ${item.presPart || '-'}</div>
+                    <div class="card-meaning">${item.meaning}</div>
+                    <hr style="border:0; height:1px; background:var(--shadow-dark); margin: 15px 0;">
+                    <div class="card-detail">${index + 1} / ${arr.length}</div>
+                    ${actionButtons}
+                </div>`;
+        }
+    }
+
+    function nextCard(type) {
+        let arr = type === 'unlearned' ? vaultData.unlearnedWords : (type === 'learned' ? vaultData.learnedWords : vaultData.grammarPoints);
+        if(arr.length === 0) return;
+        currentIndices[type] = (currentIndices[type] + 1) % arr.length;
+        renderCard(type);
+    }
+
+    // ================= 默写学习逻辑 =================
+    let currentLearnIndex = -1;
+
+    function startLearning() {
+        if(vaultData.unlearnedWords.length === 0) return alert('未学会列表为空！');
+        navTo('page-learn');
+        loadNextLearnWord();
+    }
+
+    function loadNextLearnWord() {
+        if(vaultData.unlearnedWords.length === 0) {
+            alert('恭喜！未学会的单词全部学完了！');
+            return navTo('page-menu');
+        }
+        currentLearnIndex = Math.floor(Math.random() * vaultData.unlearnedWords.length);
+        const word = vaultData.unlearnedWords[currentLearnIndex];
+        
+        document.getElementById('learn-meaning').innerText = word.meaning;
+        document.querySelectorAll('#page-learn input').forEach(input => input.value = '');
+    }
+
+    function checkLearn() {
+        const word = vaultData.unlearnedWords[currentLearnIndex];
+        const base = document.getElementById('learn-base').value.trim().toLowerCase();
+        const past = document.getElementById('learn-past').value.trim().toLowerCase();
+        const pastPart = document.getElementById('learn-pastPart').value.trim().toLowerCase();
+        const presPart = document.getElementById('learn-presPart').value.trim().toLowerCase();
+
+        const isBaseCorrect = base === word.base.toLowerCase();
+        const isPastCorrect = (!word.past && !past) || (past === word.past.toLowerCase());
+        const isPastPartCorrect = (!word.pastPart && !pastPart) || (pastPart === word.pastPart.toLowerCase());
+        const isPresPartCorrect = (!word.presPart && !presPart) || (presPart === word.presPart.toLowerCase());
+
+        if (isBaseCorrect && isPastCorrect && isPastPartCorrect && isPresPartCorrect) {
+            alert('完全正确！已移入【已学会】列表。');
+            const learnedWord = vaultData.unlearnedWords.splice(currentLearnIndex, 1)[0];
+            vaultData.learnedWords.push(learnedWord);
+            saveData();
+            loadNextLearnWord();
+        } else {
+            alert('有些地方写错啦，再仔细想想哦！');
+        }
+    }
+
+    // 修复点：新增的跳过功能
+    function skipLearn() {
+        // 直接不移除，重新加载下一个随机词
+        loadNextLearnWord();
+    }
+
+    // ================= 导入导出 TXT 功能 =================
+    function exportDataTxt() {
+        if (vaultData.unlearnedWords.length === 0 && 
+            vaultData.learnedWords.length === 0 && 
+            vaultData.grammarPoints.length === 0) {
+            return alert('当前没有任何学习数据，不需要导出空白文件哦！');
+        }
+
+        const dataStr = JSON.stringify(vaultData, null, 2);
+        const blob = new Blob([dataStr], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `EnglishVault_Backup_${new Date().toLocaleDateString().replace(/\//g, '-')}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function importDataTxt(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const importedData = JSON.parse(e.target.result);
+                if (importedData.unlearnedWords && importedData.learnedWords && importedData.grammarPoints) {
+                    vaultData = importedData;
+                    
+                    // 导入新数据后也立刻执行一遍自动体检，防止导入的老数据没有 ID
+                    upgradeLegacyData();
+                    
+                    saveData();
+                    alert('数据导入成功！');
+                } else {
+                    alert('TXT 文件格式不正确，导入失败。');
+                }
+            } catch (err) {
+                alert('解析文件失败，请确保导入的是之前导出的 TXT 备份文件。');
+            }
+            event.target.value = ''; 
+        };
+        reader.readAsText(file);
+    }
+
+</script>
+</body>
+</html>
