@@ -109,85 +109,87 @@
         </div>
     </div>
 
-   <div id="page-edit-word" class="page">
-           <div class="nav-bar">
-               <button class="back-btn" onclick="goBackFromEditWord()">◀ 退回</button>
-               <h2 id="word-page-title">雕琢原石</h2>
-               <div style="width: 50px;"></div>
-           </div>
-           <input type="hidden" id="edit-word-id">
-           <input type="hidden" id="edit-word-type">
-           <input type="text" id="edit-base" class="neo-input" placeholder="🪨 原型 (Base)">
-           <input type="text" id="edit-past" class="neo-input" placeholder="⏳ 过去式 (Past)">
-           <input type="text" id="edit-pastPart" class="neo-input" placeholder="🕰️ 过去分词 (Past Participle)">
-           <input type="text" id="edit-presPart" class="neo-input" placeholder="🌊 现在分词 (Present Participle)">
-           <input type="text" id="edit-meaning" class="neo-input" placeholder="💡 石之真意 (中文词意)">
-           <button class="neo-btn primary" id="save-word-btn" onclick="saveWord()">存入石室</button>
-       </div>
-   
-       <div id="page-unlearned" class="page">
-           <div class="nav-bar">
-               <button class="back-btn" onclick="navTo('page-menu')">◀ 返回大厅</button>
-               <h2>粗糙原石</h2>
-               <div style="width: 50px;"></div>
-           </div>
-           <div id="unlearned-card-container"></div>
-           <button class="neo-btn" onclick="nextCard('unlearned')">换一块原石 (Next)</button>
-       </div>
-   
-       <div id="page-learn" class="page">
-           <div class="nav-bar">
-               <button class="back-btn" onclick="navTo('page-menu')">◀ 退出试炼</button>
-               <h2>打磨试炼</h2>
-               <div style="width: 50px;"></div>
-           </div>
-           <div class="neo-card" style="margin-bottom: 20px;">
-               <p class="card-detail">请凭借记忆，刻下这块石头应有的纹理：</p>
-               <div id="learn-meaning" class="card-meaning" style="font-size: 24px; color: var(--accent-color);"></div>
-           </div>
-           <input type="text" id="learn-base" class="neo-input" placeholder="🪨 原型">
-           <input type="text" id="learn-past" class="neo-input" placeholder="⏳ 过去式">
-           <input type="text" id="learn-pastPart" class="neo-input" placeholder="🕰️ 过去分词">
-           <input type="text" id="learn-presPart" class="neo-input" placeholder="🌊 现在分词">
-           
-           <div class="action-group" style="margin-top: 0;">
-               <button class="neo-btn warning" onclick="skipLearn()">太硬了，先放下 (Skip)</button>
-               <button class="neo-btn success" onclick="checkLearn()">完成打磨 (Submit)</button>
-           </div>
-       </div>
-   
-       <div id="page-learned" class="page">
-           <div class="nav-bar">
-               <button class="back-btn" onclick="navTo('page-menu')">◀ 返回大厅</button>
-               <h2>光洁宝石</h2>
-               <div style="width: 50px;"></div>
-           </div>
-           <div id="learned-card-container"></div>
-           <button class="neo-btn" onclick="nextCard('learned')">赏玩下一颗 (Next)</button>
-       </div>
-   
-       <div id="page-edit-grammar" class="page">
-           <div class="nav-bar">
-               <button class="back-btn" onclick="goBackFromEditGrammar()">◀ 退回</button>
-               <h2 id="grammar-page-title">镌刻碑文</h2>
-               <div style="width: 50px;"></div>
-           </div>
-           <input type="hidden" id="edit-gram-id">
-           <input type="text" id="edit-gram-title" class="neo-input" placeholder="🗿 碑文标题">
-           <textarea id="edit-gram-content" class="neo-input" placeholder="📜 刻下语法规则与感悟..."></textarea>
-           <button class="neo-btn primary" id="save-grammar-btn" onclick="saveGrammar()">立起石碑</button>
-       </div>
-   
-       <div id="page-grammar-list" class="page">
-           <div class="nav-bar">
-               <button class="back-btn" onclick="navTo('page-menu')">◀ 返回大厅</button>
-               <h2>语法碑林</h2>
-               <div style="width: 50px;"></div>
-           </div>
-           <div id="grammar-card-container"></div>
-           <button class="neo-btn" onclick="nextCard('grammar')">瞻仰下一座 (Next)</button>
-       </div>
-	
+    <div id="page-edit-word" class="page">
+        <div class="nav-bar">
+            <button class="back-btn" onclick="goBackFromEditWord()">◀ 退回</button>
+            <h2 id="word-page-title">雕琢原石</h2>
+            <div style="width: 50px;"></div>
+        </div>
+        <input type="hidden" id="edit-word-id">
+        <input type="hidden" id="edit-word-type">
+        <input type="text" id="edit-base" class="neo-input" placeholder="🪨 原型 (Base)">
+        <input type="text" id="edit-past" class="neo-input" placeholder="⏳ 过去式 (Past)">
+        <input type="text" id="edit-pastPart" class="neo-input" placeholder="🕰️ 过去分词 (Past Participle)">
+        <input type="text" id="edit-presPart" class="neo-input" placeholder="🌊 现在分词 (Present Participle)">
+        <input type="text" id="edit-meaning" class="neo-input" placeholder="💡 石之真意 (中文词意)">
+        <textarea id="edit-usage" class="neo-input" placeholder="🔗 伴生矿脉 (固定搭配与额外用法...)"></textarea>
+        
+        <button class="neo-btn primary" id="save-word-btn" onclick="saveWord()">存入石室</button>
+    </div>
+
+    <div id="page-unlearned" class="page">
+        <div class="nav-bar">
+            <button class="back-btn" onclick="navTo('page-menu')">◀ 返回大厅</button>
+            <h2>粗糙原石</h2>
+            <div style="width: 50px;"></div>
+        </div>
+        <div id="unlearned-card-container"></div>
+        <button class="neo-btn" onclick="nextCard('unlearned')">换一块原石 (Next)</button>
+    </div>
+
+    <div id="page-learn" class="page">
+        <div class="nav-bar">
+            <button class="back-btn" onclick="navTo('page-menu')">◀ 退出试炼</button>
+            <h2>打磨试炼</h2>
+            <div style="width: 50px;"></div>
+        </div>
+        <div class="neo-card" style="margin-bottom: 20px;">
+            <p class="card-detail">请凭借记忆，刻下这块石头应有的纹理：</p>
+            <div id="learn-meaning" class="card-meaning" style="font-size: 24px; color: var(--accent-color);"></div>
+        </div>
+        <input type="text" id="learn-base" class="neo-input" placeholder="🪨 原型">
+        <input type="text" id="learn-past" class="neo-input" placeholder="⏳ 过去式">
+        <input type="text" id="learn-pastPart" class="neo-input" placeholder="🕰️ 过去分词">
+        <input type="text" id="learn-presPart" class="neo-input" placeholder="🌊 现在分词">
+        
+        <div class="action-group" style="margin-top: 0;">
+            <button class="neo-btn warning" onclick="skipLearn()">太硬了，先放下 (Skip)</button>
+            <button class="neo-btn success" onclick="checkLearn()">完成打磨 (Submit)</button>
+        </div>
+    </div>
+
+    <div id="page-learned" class="page">
+        <div class="nav-bar">
+            <button class="back-btn" onclick="navTo('page-menu')">◀ 返回大厅</button>
+            <h2>光洁宝石</h2>
+            <div style="width: 50px;"></div>
+        </div>
+        <div id="learned-card-container"></div>
+        <button class="neo-btn" onclick="nextCard('learned')">赏玩下一颗 (Next)</button>
+    </div>
+
+    <div id="page-edit-grammar" class="page">
+        <div class="nav-bar">
+            <button class="back-btn" onclick="goBackFromEditGrammar()">◀ 退回</button>
+            <h2 id="grammar-page-title">镌刻碑文</h2>
+            <div style="width: 50px;"></div>
+        </div>
+        <input type="hidden" id="edit-gram-id">
+        <input type="text" id="edit-gram-title" class="neo-input" placeholder="🗿 碑文标题">
+        <textarea id="edit-gram-content" class="neo-input" placeholder="📜 刻下语法规则与感悟..."></textarea>
+        <button class="neo-btn primary" id="save-grammar-btn" onclick="saveGrammar()">立起石碑</button>
+    </div>
+
+    <div id="page-grammar-list" class="page">
+        <div class="nav-bar">
+            <button class="back-btn" onclick="navTo('page-menu')">◀ 返回大厅</button>
+            <h2>语法碑林</h2>
+            <div style="width: 50px;"></div>
+        </div>
+        <div id="grammar-card-container"></div>
+        <button class="neo-btn" onclick="nextCard('grammar')">瞻仰下一座 (Next)</button>
+    </div>
+
 </div>
 
 <script>
@@ -199,7 +201,6 @@
     };
 
     function generateId() {
-        // 使用随机字符确保生成的 ID 绝对唯一，防止旧版本重复冲突
         return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
     }
 
@@ -209,7 +210,6 @@
         localStorage.setItem('grammarPoints', JSON.stringify(vaultData.grammarPoints));
     }
 
-    // 修复点：静默升级旧数据，给所有之前存的、没有 ID 的旧单词自动补上 ID！
     function upgradeLegacyData() {
         let needsSave = false;
         ['unlearnedWords', 'learnedWords', 'grammarPoints'].forEach(category => {
@@ -222,7 +222,6 @@
         });
         if (needsSave) saveData();
     }
-    // 网页一加载就运行体检修复
     upgradeLegacyData();
 
     // ================= 页面导航控制 =================
@@ -251,20 +250,21 @@
         const titleEl = document.getElementById('word-page-title');
         const btnEl = document.getElementById('save-word-btn');
         document.querySelectorAll('#page-edit-word input.neo-input').forEach(input => input.value = '');
+        document.getElementById('edit-usage').value = ''; // 清空新文本框
         
         if (mode === 'add') {
-            titleEl.innerText = 'Add Word';
-            btnEl.innerText = '保存到未学会';
+            titleEl.innerText = '雕琢新原石';
+            btnEl.innerText = '存入石室';
             document.getElementById('edit-word-id').value = '';
             document.getElementById('edit-word-type').value = 'unlearned'; 
         } else if (mode === 'edit') {
-            titleEl.innerText = 'Edit Word';
-            btnEl.innerText = '保存修改';
+            titleEl.innerText = '修补原石';
+            btnEl.innerText = '完成修补';
             
             const arr = type === 'unlearned' ? vaultData.unlearnedWords : vaultData.learnedWords;
             const word = arr.find(w => w.id === id);
             
-            if(!word) return alert('数据错误，找不到该单词');
+            if(!word) return alert('数据错误，找不到该石头');
 
             document.getElementById('edit-word-id').value = word.id;
             document.getElementById('edit-word-type').value = type;
@@ -273,6 +273,7 @@
             document.getElementById('edit-pastPart').value = word.pastPart || '';
             document.getElementById('edit-presPart').value = word.presPart || '';
             document.getElementById('edit-meaning').value = word.meaning || '';
+            document.getElementById('edit-usage').value = word.usage || ''; // 加载固定词组
         }
         navTo('page-edit-word'); 
     }
@@ -285,21 +286,23 @@
         const pastPart = document.getElementById('edit-pastPart').value.trim();
         const presPart = document.getElementById('edit-presPart').value.trim();
         const meaning = document.getElementById('edit-meaning').value.trim();
+        const usage = document.getElementById('edit-usage').value.trim(); // 获取固定词组
 
-        if(!base || !meaning) return alert('原型和词意不能为空！');
+        if(!base || !meaning) return alert('原型和真意(词意)不能为空！');
 
-        const wordObj = { id: id || generateId(), base, past, pastPart, presPart, meaning };
+        const wordObj = { id: id || generateId(), base, past, pastPart, presPart, meaning, usage };
 
         if (id) {
             const arr = type === 'unlearned' ? vaultData.unlearnedWords : vaultData.learnedWords;
             const index = arr.findIndex(w => w.id === id);
             if(index > -1) arr[index] = wordObj;
-            alert('修改成功！');
+            alert('修补成功！');
             goBackFromEditWord(type);
         } else {
             vaultData.unlearnedWords.push(wordObj);
-            alert('添加成功！数据已实时保存在浏览器中。');
+            alert('雕琢成功！原石已妥善保存。');
             document.querySelectorAll('#page-edit-word input.neo-input').forEach(input => input.value = '');
+            document.getElementById('edit-usage').value = '';
         }
         saveData();
     }
@@ -321,12 +324,12 @@
         document.getElementById('edit-gram-content').value = '';
         
         if (mode === 'add') {
-            titleEl.innerText = 'Add Grammar';
-            btnEl.innerText = '保存语法';
+            titleEl.innerText = '镌刻新碑文';
+            btnEl.innerText = '立起石碑';
             document.getElementById('edit-gram-id').value = '';
         } else if (mode === 'edit') {
-            titleEl.innerText = 'Edit Grammar';
-            btnEl.innerText = '保存修改';
+            titleEl.innerText = '修补碑文';
+            btnEl.innerText = '完成修补';
             
             const gram = vaultData.grammarPoints.find(g => g.id === id);
             if(!gram) return alert('数据错误');
@@ -343,18 +346,18 @@
         const title = document.getElementById('edit-gram-title').value.trim();
         const content = document.getElementById('edit-gram-content').value.trim();
 
-        if(!title || !content) return alert('标题和内容不能为空！');
+        if(!title || !content) return alert('标题和碑文不能为空！');
 
         const gramObj = { id: id || generateId(), title, content };
 
         if (id) {
             const index = vaultData.grammarPoints.findIndex(g => g.id === id);
             if(index > -1) vaultData.grammarPoints[index] = gramObj;
-            alert('修改成功！');
+            alert('修补成功！');
             goBackFromEditGrammar();
         } else {
             vaultData.grammarPoints.push(gramObj);
-            alert('语法添加成功！数据已实时保存在浏览器中。');
+            alert('新石碑已立起！');
             document.getElementById('edit-gram-title').value = '';
             document.getElementById('edit-gram-content').value = '';
         }
@@ -371,7 +374,7 @@
     }
 
     function deleteItem(type, id) {
-        if(!confirm('确定要删除这条记录吗？删除后无法恢复！')) return;
+        if(!confirm('确定要粉碎这块石头吗？碎片将无法复原！')) return;
 
         let arr = type === 'unlearned' ? vaultData.unlearnedWords : (type === 'learned' ? vaultData.learnedWords : vaultData.grammarPoints);
         const index = arr.findIndex(item => item.id === id);
@@ -390,7 +393,7 @@
     }
 
     function moveToUnlearned(id) {
-        if(!confirm('这将被移回【未学会】列表并需要重新默写，确定吗？')) return;
+        if(!confirm('这颗宝石光泽暗淡了，要将其退为原石重新打磨吗？')) return;
 
         const index = vaultData.learnedWords.findIndex(w => w.id === id);
         if(index > -1) {
@@ -404,7 +407,7 @@
                 currentIndices.learned = 0;
             }
             
-            alert('已成功移回【未学会】列表！');
+            alert('已成功退回矿库，等待重新打磨！');
             renderCard('learned'); 
         }
     }
@@ -427,16 +430,27 @@
         
         let revertBtnHtml = '';
         if (type === 'learned') {
-            revertBtnHtml = `<button class="neo-btn warning" onclick="moveToUnlearned('${item.id}')">🔄 重学</button>`;
+            revertBtnHtml = `<button class="neo-btn warning" onclick="moveToUnlearned('${item.id}')">🔄 退为原石</button>`;
         }
 
         let actionButtons = `
             <div class="action-group">
                 <button class="neo-btn" onclick="if('${type}' === 'grammar') prepareGrammarForm('edit', '${item.id}'); else prepareWordForm('edit', '${type}', '${item.id}')">编辑</button>
                 ${revertBtnHtml}
-                <button class="neo-btn danger" onclick="deleteItem('${type}', '${item.id}')">删除</button>
+                <button class="neo-btn danger" onclick="deleteItem('${type}', '${item.id}')">粉碎</button>
             </div>
         `;
+
+        // 如果存在伴生矿脉(固定用法)，则渲染一块专属区域
+        let usageHtml = '';
+        if(type !== 'grammar' && item.usage) {
+            usageHtml = `
+                <div class="card-detail" style="margin-top: 15px; padding: 12px; background: rgba(0,0,0,0.03); border-radius: 10px; text-align: left; line-height: 1.5; box-shadow: inset 2px 2px 5px var(--shadow-dark), inset -2px -2px 5px var(--shadow-light);">
+                    <b style="color: var(--text-color);">🔗 伴生矿脉:</b><br>
+                    ${item.usage.replace(/\n/g, '<br>')}
+                </div>
+            `;
+        }
 
         if(type === 'grammar') {
             container.innerHTML = `
@@ -455,6 +469,7 @@
                     <div class="card-detail">过去分词: ${item.pastPart || '-'}</div>
                     <div class="card-detail">现在分词: ${item.presPart || '-'}</div>
                     <div class="card-meaning">${item.meaning}</div>
+                    ${usageHtml}
                     <hr style="border:0; height:1px; background:var(--shadow-dark); margin: 15px 0;">
                     <div class="card-detail">${index + 1} / ${arr.length}</div>
                     ${actionButtons}
@@ -473,14 +488,14 @@
     let currentLearnIndex = -1;
 
     function startLearning() {
-        if(vaultData.unlearnedWords.length === 0) return alert('未学会列表为空！');
+        if(vaultData.unlearnedWords.length === 0) return alert('矿场空空如也，去捡些原石吧！');
         navTo('page-learn');
         loadNextLearnWord();
     }
 
     function loadNextLearnWord() {
         if(vaultData.unlearnedWords.length === 0) {
-            alert('恭喜！未学会的单词全部学完了！');
+            alert('恭喜！原石已全部打磨完毕！');
             return navTo('page-menu');
         }
         currentLearnIndex = Math.floor(Math.random() * vaultData.unlearnedWords.length);
@@ -503,19 +518,17 @@
         const isPresPartCorrect = (!word.presPart && !presPart) || (presPart === word.presPart.toLowerCase());
 
         if (isBaseCorrect && isPastCorrect && isPastPartCorrect && isPresPartCorrect) {
-            alert('完全正确！已移入【已学会】列表。');
+            alert('打磨完美！原石已化作光洁宝石。');
             const learnedWord = vaultData.unlearnedWords.splice(currentLearnIndex, 1)[0];
             vaultData.learnedWords.push(learnedWord);
             saveData();
             loadNextLearnWord();
         } else {
-            alert('有些地方写错啦，再仔细想想哦！');
+            alert('纹理不对，再回忆一下！');
         }
     }
 
-    // 修复点：新增的跳过功能
     function skipLearn() {
-        // 直接不移除，重新加载下一个随机词
         loadNextLearnWord();
     }
 
@@ -524,7 +537,7 @@
         if (vaultData.unlearnedWords.length === 0 && 
             vaultData.learnedWords.length === 0 && 
             vaultData.grammarPoints.length === 0) {
-            return alert('当前没有任何学习数据，不需要导出空白文件哦！');
+            return alert('石室目前空空如也，没有拓片可以带走哦！');
         }
 
         const dataStr = JSON.stringify(vaultData, null, 2);
@@ -533,7 +546,7 @@
         
         const a = document.createElement('a');
         a.href = url;
-        a.download = `EnglishVault_Backup_${new Date().toLocaleDateString().replace(/\//g, '-')}.txt`;
+        a.download = `Pebble_Backup_${new Date().toLocaleDateString().replace(/\//g, '-')}.txt`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -550,17 +563,14 @@
                 const importedData = JSON.parse(e.target.result);
                 if (importedData.unlearnedWords && importedData.learnedWords && importedData.grammarPoints) {
                     vaultData = importedData;
-                    
-                    // 导入新数据后也立刻执行一遍自动体检，防止导入的老数据没有 ID
                     upgradeLegacyData();
-                    
                     saveData();
-                    alert('数据导入成功！');
+                    alert('拓片解读成功！石室已恢复记忆。');
                 } else {
-                    alert('TXT 文件格式不正确，导入失败。');
+                    alert('拓片残破无法解读，导入失败。');
                 }
             } catch (err) {
-                alert('解析文件失败，请确保导入的是之前导出的 TXT 备份文件。');
+                alert('解析拓片失败，请确保带来的是本石室的专属拓片(.txt)。');
             }
             event.target.value = ''; 
         };
