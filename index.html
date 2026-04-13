@@ -134,7 +134,10 @@
             <div style="width: 50px;"></div>
         </div>
         <div id="unlearned-card-container"></div>
-        <button class="neo-btn" onclick="nextCard('unlearned')">换一块原石 (Next)</button>
+        <div class="action-group">
+            <button class="neo-btn" onclick="prevCard('unlearned')">◀ 上一块 (Prev)</button>
+            <button class="neo-btn" onclick="nextCard('unlearned')">下一块 (Next) ▶</button>
+        </div>
     </div>
 
     <div id="page-learn" class="page">
@@ -165,7 +168,10 @@
             <div style="width: 50px;"></div>
         </div>
         <div id="learned-card-container"></div>
-        <button class="neo-btn" onclick="nextCard('learned')">赏玩下一颗 (Next)</button>
+        <div class="action-group">
+            <button class="neo-btn" onclick="prevCard('learned')">◀ 上一颗 (Prev)</button>
+            <button class="neo-btn" onclick="nextCard('learned')">下一颗 (Next) ▶</button>
+        </div>
     </div>
 
     <div id="page-edit-grammar" class="page">
@@ -187,7 +193,10 @@
             <div style="width: 50px;"></div>
         </div>
         <div id="grammar-card-container"></div>
-        <button class="neo-btn" onclick="nextCard('grammar')">瞻仰下一座 (Next)</button>
+        <div class="action-group">
+            <button class="neo-btn" onclick="prevCard('grammar')">◀ 上一座 (Prev)</button>
+            <button class="neo-btn" onclick="nextCard('grammar')">下一座 (Next) ▶</button>
+        </div>
     </div>
 
 </div>
@@ -250,7 +259,7 @@
         const titleEl = document.getElementById('word-page-title');
         const btnEl = document.getElementById('save-word-btn');
         document.querySelectorAll('#page-edit-word input.neo-input').forEach(input => input.value = '');
-        document.getElementById('edit-usage').value = ''; // 清空新文本框
+        document.getElementById('edit-usage').value = ''; 
         
         if (mode === 'add') {
             titleEl.innerText = '雕琢新原石';
@@ -273,7 +282,7 @@
             document.getElementById('edit-pastPart').value = word.pastPart || '';
             document.getElementById('edit-presPart').value = word.presPart || '';
             document.getElementById('edit-meaning').value = word.meaning || '';
-            document.getElementById('edit-usage').value = word.usage || ''; // 加载固定词组
+            document.getElementById('edit-usage').value = word.usage || ''; 
         }
         navTo('page-edit-word'); 
     }
@@ -286,7 +295,7 @@
         const pastPart = document.getElementById('edit-pastPart').value.trim();
         const presPart = document.getElementById('edit-presPart').value.trim();
         const meaning = document.getElementById('edit-meaning').value.trim();
-        const usage = document.getElementById('edit-usage').value.trim(); // 获取固定词组
+        const usage = document.getElementById('edit-usage').value.trim(); 
 
         if(!base || !meaning) return alert('原型和真意(词意)不能为空！');
 
@@ -441,7 +450,6 @@
             </div>
         `;
 
-        // 如果存在伴生矿脉(固定用法)，则渲染一块专属区域
         let usageHtml = '';
         if(type !== 'grammar' && item.usage) {
             usageHtml = `
@@ -477,6 +485,16 @@
         }
     }
 
+    // 新增：上一页逻辑
+    function prevCard(type) {
+        let arr = type === 'unlearned' ? vaultData.unlearnedWords : (type === 'learned' ? vaultData.learnedWords : vaultData.grammarPoints);
+        if(arr.length === 0) return;
+        // 加上 arr.length 是为了防止出现负数索引，实现完美循环
+        currentIndices[type] = (currentIndices[type] - 1 + arr.length) % arr.length;
+        renderCard(type);
+    }
+
+    // 原有的：下一页逻辑
     function nextCard(type) {
         let arr = type === 'unlearned' ? vaultData.unlearnedWords : (type === 'learned' ? vaultData.learnedWords : vaultData.grammarPoints);
         if(arr.length === 0) return;
