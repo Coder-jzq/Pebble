@@ -48,11 +48,19 @@
             box-shadow: 6px 6px 12px var(--shadow-dark), -6px -6px 12px var(--shadow-light);
             transition: all 0.2s ease;
         }
-        .neo-btn:active { box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); }
+        .neo-btn:active:not(:disabled) { box-shadow: inset 4px 4px 8px var(--shadow-dark), inset -4px -4px 8px var(--shadow-light); }
         .neo-btn.primary { color: var(--accent-color); }
         .neo-btn.success { color: var(--success-color); }
         .neo-btn.danger { color: var(--danger-color); }
         .neo-btn.warning { color: var(--warning-color); }
+        
+        /* === 新增：封印(禁用)状态的按钮样式 === */
+        .neo-btn:disabled {
+            color: #b0a89f !important; /* 强制字体变暗/变灰 */
+            opacity: 0.6; /* 整体变半透明 */
+            cursor: not-allowed; /* 鼠标放上去变成禁止符号 */
+            box-shadow: 3px 3px 6px var(--shadow-dark), -3px -3px 6px var(--shadow-light); /* 阴影变浅，表现出沉寂感 */
+        }
         
         /* 动作按钮组 */
         .action-group { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
@@ -96,8 +104,10 @@
         <h1>石室典藏</h1>
         <button class="neo-btn" onclick="prepareWordForm('add')">⛏️ 捡拾新原石</button>
         <button class="neo-btn" onclick="navTo('page-unlearned')">🔍 端详原石</button>
-        <button class="neo-btn primary" onclick="startLearning()">🔨 打磨试炼</button>
-        <button class="neo-btn" onclick="navTo('page-learned')">✨ 已开盒</button>
+        
+        <button class="neo-btn primary" disabled>🔨 打磨试炼（封印）</button>
+        <button class="neo-btn" disabled>✨ 已开盒（封印）</button>
+        
         <div style="height: 15px;"></div>
         <button class="neo-btn" onclick="prepareGrammarForm('add')">🗿 凿刻规则石碑</button>
         <button class="neo-btn" onclick="navTo('page-grammar-list')">🏛️ 漫步语法碑林</button>
@@ -485,16 +495,13 @@
         }
     }
 
-    // 新增：上一页逻辑
     function prevCard(type) {
         let arr = type === 'unlearned' ? vaultData.unlearnedWords : (type === 'learned' ? vaultData.learnedWords : vaultData.grammarPoints);
         if(arr.length === 0) return;
-        // 加上 arr.length 是为了防止出现负数索引，实现完美循环
         currentIndices[type] = (currentIndices[type] - 1 + arr.length) % arr.length;
         renderCard(type);
     }
 
-    // 原有的：下一页逻辑
     function nextCard(type) {
         let arr = type === 'unlearned' ? vaultData.unlearnedWords : (type === 'learned' ? vaultData.learnedWords : vaultData.grammarPoints);
         if(arr.length === 0) return;
